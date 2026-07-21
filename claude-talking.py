@@ -26,7 +26,7 @@ def add_user_message(messages, text):
     user_message = {"role": "user", "content": text}
     messages.append(user_message)
 
-def chat(messages, system=None, temperature=1.0, stop_sequences=None):
+def chat(messages, system=None, temperature=0.3, stop_sequences=None):
     params = {
         "model": model,
         "max_tokens": 2500,
