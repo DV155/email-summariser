@@ -29,8 +29,8 @@ def getEmails():
             token.write(creds.to_json())
     try:
         service = build('gmail', 'v1', credentials=creds)
-        #results = service.users().labels().list(userId='me').execute()
-        #labels = results.get('labels', [])
+        results = service.users().messages().list(userId='me').execute()
+        messages = results.get('messages', [])
     except HttpError as error:
         print(f'An error occurred: {error}')
 
