@@ -12,7 +12,7 @@ load_dotenv()
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-def getEmails():
+def getGmail():
     creds = None
 
     if os.path.exists('token.json'):
@@ -40,4 +40,4 @@ def getEmails():
 
 
 if __name__ == '__main__':
-    getEmails()
+    getGmail()
