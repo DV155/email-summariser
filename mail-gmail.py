@@ -31,6 +31,10 @@ def getEmails():
         service = build('gmail', 'v1', credentials=creds)
         results = service.users().messages().list(userId='me').execute()
         messages = results.get('messages', [])
+
+        for msg in messages:
+            txt = service.users().messages().get(userId='me', id=msg['id']).execute()
+
     except HttpError as error:
         print(f'An error occurred: {error}')
 
