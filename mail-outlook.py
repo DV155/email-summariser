@@ -2,6 +2,7 @@ import os
 import msal
 import requests
 from datetime import datetime, timedelta, timezone, days
+from bs4 import BeautifulSoup
 
 SCOPES = ["Mail.Read"]
 CACHE_FILE = "ms-token.json"
@@ -31,12 +32,28 @@ def getCreds():
     
 
 def getOutlook():
-    emails = []
+    token = getCreds()
     since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+
+    r = requests.get("https://graph.microsoft.com/v1.0/me/messages", headers={"Authorization": f"Bearer {token}"}, params={"$filter": f"receivedDateTime ge {since}", "$top": 50})
+    r.raise_for_status()
+
+    emails = []
+    for m in r.json()["value"]:
+        body = m["body"]["content"]
+        if m["body"]["contentType"] == "html":
+            body = BeautifulSoup(body, "html.parser").get_text(" ", strip=True)
+        emails.append({
+            "from": m["from"]["emailAddress"]["address"],
+            "subject": m.get("subject") or "(no subject)",
+            "date": m["receivedDateTime"],
+            "body": body[:1500],
+        })
+
 
     return emails
 
 
 if __name__ == '__main__':
     for e in getOutlook():
-        '''placeholder'''
+        print(e["date"], "|", e["from"], "|", e["subject"])
