@@ -59,4 +59,4 @@ def getGmail(days=7):
 
 if __name__ == '__main__':
     for e in getGmail():
-        print(e['date'], '|', e['from'], '|', e['subject'])
+        '''print(e['date'], '|', e['from'], '|', e['subject'])'''

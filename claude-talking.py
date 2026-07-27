@@ -28,7 +28,7 @@ def add_user_message(messages, text):
 def chat(messages, system=None, temperature=0.3, stop_sequences=None):
     params = {
         "model": model,
-        "max_tokens": 2500,
+        "max_tokens": 1500,
         "messages": messages,
         "temperature": temperature
     }
@@ -54,10 +54,18 @@ You should:
 - Summarise them in a concise manner while retaining a large degree of accuracy - drop the fluff but keep the important things;
 - If an email contains an important attatchment, mention it and that you can't read it for the purposes of the summary;
 - If no emails are present in either inbox, simply say so without summarising anything;
+- Mention purely promotional emails but don't summarise them;
 You should NOT:
 - Use conversational wrappers of any kind, unless mentioned in the "You should:" section;
 - Use sycophantic fillers of any kind, unless mentioned in the "You should:" section;
 - Read or summarise emails marked as spam;
 - Read or summarise emails related to appointments/reservations the date for which is before the current system date;
 """
+
+if __name__ == "__main__":
+    emails = getGmail(days=7)
+    messages = []
+    add_user_message(messages, str(emails))
+    summary = chat(messages, system=system_prompt)
+    print(summary)
 
