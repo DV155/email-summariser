@@ -3,11 +3,18 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import base64
+from bs4 import BeautifulSoup
 from email import message_from_bytes
 from email.policy import default 
 import os
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+def getHTML(html):
+    soup = BeautifulSoup(html, "html.parser")
+    for tag in soup:
+        tag.decompose()
+    return soup.get_text(separator="\n", strip=True)
 
 def getCreds():
     creds = None
@@ -44,7 +51,13 @@ def getGmail(days=7):
         mime_msg = message_from_bytes(raw, policy=default)
 
         body_part = mime_msg.get_body(preferencelist=('plain', 'html'))
-        body = body_part.get_content() if body_part else ''
+        if body_part:
+            body = body_part.get_content()
+            if body.get_content_type() == "text/html":
+                body = getHTML(body)
+        else:
+            body = ''
+
 
         emails.append({
             'from': mime_msg['From'] or '',
