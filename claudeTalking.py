@@ -9,7 +9,7 @@ from mailGmail import getGmail
 
 import os
 import base64
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from email import message_from_bytes
 from dotenv import load_dotenv
@@ -47,7 +47,7 @@ def chat(messages, system=None, temperature=0.3, stop_sequences=None, on_text=No
     return message.content[0].text
 
 
-system_prompt = """
+system_template = """
 You summarise a user's e-mail inbox covering the last 7 days.
 
 You receive a list of emails, each with fields: "from", "subject", "date", "body".
@@ -77,6 +77,8 @@ Rules:
 Never use conversational wrappers, preambles, sign-offs, or flattery beyond the
 required greeting line.
 """
+
+system_prompt = system_template.format(today=date.today().isoformat )
 
 if __name__ == "__main__":
     emails = getGmail(days=7)
