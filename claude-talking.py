@@ -25,7 +25,7 @@ def add_user_message(messages, text):
     user_message = {"role": "user", "content": text}
     messages.append(user_message)
 
-def chat(messages, system=None, temperature=0.3, stop_sequences=None):
+def chat(messages, system=None, temperature=0.3, stop_sequences=None, on_text=None):
     params = {
         "model": model,
         "max_tokens": 1500,
@@ -41,7 +41,12 @@ def chat(messages, system=None, temperature=0.3, stop_sequences=None):
     if stop_sequences:
         params["stop_sequences"] = stop_sequences
     
-    message = client.messages.create(**params)
+    with client.messages.stream(**params) as stream:
+        for text in stream.text_stream:
+            if on_text:
+                on_text(text)
+        message = stream.get_final_message()
+
     return message.content[0].text
 
 
