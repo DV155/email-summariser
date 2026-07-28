@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 client = Anthropic()
-model = "claude-opus-4-6"
+model = "claude-haiku-4-5"
 
 def add_user_message(messages, text):
     user_message = {"role": "user", "content": text}
