@@ -4,8 +4,6 @@ from anthropic import Anthropic
 import msal
 import requests
 
-import webview
-
 from mailGmail import getGmail
 '''from mailOutlook import getOutlook'''
 
