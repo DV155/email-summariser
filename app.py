@@ -47,3 +47,10 @@ def run(window):
         system=system_prompt,
         on_text=lambda t: window.evaluate_js(f"appendText({json.dumps(t)})"),
     )
+
+if __name__ == "__main__":
+    window = webview.create_window(
+        "Weekly Email Summary", html=HTML,
+        frameless=True, width=600, height=800, js_api=Api(),
+    )
+    webview.start(run, window)
