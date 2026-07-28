@@ -36,12 +36,21 @@ class Api:
     def close(self):
         webview.windows[0].destroy
 
+def formatEmails(emails, max_body=1500):
+    blocks = []
+    for e in emails:
+        body = e["body"][:max_body]
+        blocks.append(
+            f"From: {e['from']}\nDate: {e['date']}\nSubject: {e['subject']}\n\n{body}"
+        )
+    return "\n\n---\n\n".join(blocks)
+
 
 def run(window):
     window.events.loaded.wait()
     emails = getGmail(days=7)
     messages = []
-    add_user_message(messages, str(emails))
+    add_user_message(messages, formatEmails(emails))
     chat(
         messages,
         system=system_prompt,

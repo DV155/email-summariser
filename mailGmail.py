@@ -41,7 +41,7 @@ def getGmail(days=7):
     creds = getCreds()
 
     service = build('gmail', 'v1', credentials=creds)
-    results = service.users().messages().list(userId='me', q=f'newer_than:{days}d', maxResults=100).execute()
+    results = service.users().messages().list(userId='me', q=f'newer_than:7d', maxResults=100).execute()
     messages = results.get('messages', [])
 
     emails = []
@@ -53,8 +53,8 @@ def getGmail(days=7):
         body_part = mime_msg.get_body(preferencelist=('plain', 'html'))
         if body_part:
             body = body_part.get_content()
-            if body.get_content_type() == "text/html":
-                body = getHTML(body)
+            if body_part.get_content_type() == "text/html":
+                body = BeautifulSoup(body, "html.parser").get_text()
         else:
             body = ''
 
