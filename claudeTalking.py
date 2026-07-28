@@ -10,7 +10,6 @@ from mailGmail import getGmail
 '''from mailOutlook import getOutlook'''
 
 import os
-import json
 import base64
 from datetime import datetime, timedelta
 from pathlib import Path
