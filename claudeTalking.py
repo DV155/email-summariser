@@ -23,6 +23,13 @@ KEY_NAME = "anthropic"
 client = Anthropic()
 model = "claude-haiku-4-5"
 
+def getApiKey():
+    key = keyring.get_password(SERVICE, KEY_NAME)
+    if not key:
+        key = input("Paste your Anthropic API key").strip()
+        keyring.set_password(SERVICE, KEY_NAME, key)
+    return key
+
 
 
 def add_user_message(messages, text):
