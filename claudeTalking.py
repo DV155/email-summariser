@@ -13,10 +13,17 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from email import message_from_bytes
 from dotenv import load_dotenv
+import keyring
 
 load_dotenv()
+
+SERVICE = "email-summariser"
+KEY_NAME = "anthropic"
+
 client = Anthropic()
 model = "claude-haiku-4-5"
+
+
 
 def add_user_message(messages, text):
     user_message = {"role": "user", "content": text}
