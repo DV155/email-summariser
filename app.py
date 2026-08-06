@@ -4,23 +4,62 @@ from claudeTalking import *
 import sys, os, keyring
 from mailGmail import getGmail
 
+SERVICE, KEY_NAME = "email-summariser", "anthropic"
+
+# --- Key-entry window (first run only) ---
+SETUP_HTML = """
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; height: 100%; }
+  body { font-family: 'Segoe UI', sans-serif; background: #1e1e2e; color: #cdd6f4;
+         padding: 2rem; box-sizing: border-box; }
+  input { width: 100%; padding: 8px; box-sizing: border-box; margin-top: 8px; }
+  button { margin-top: 12px; padding: 8px 16px; cursor: pointer; }
+  .err { color: #f38ba8; margin-top: 8px; min-height: 1em; }
+</style></head><body>
+  <h3>Enter your Anthropic API key</h3>
+  <p>Stored securely on this computer. You only enter it once.</p>
+  <input id="key" type="password" placeholder="sk-ant-..." />
+  <button onclick="save()">Save</button>
+  <div class="err" id="err"></div>
+  <script>
+    async function save() {
+      const res = await pywebview.api.save_key(document.getElementById('key').value);
+      if (!res.ok) document.getElementById('err').textContent = res.error;
+    }
+  </script>
+</body></html>
+"""
+
+class SetupApi:
+    def save_key(self, key):
+        key = (key or "").strip()
+        if not key:
+            return {"ok": False, "error": "Please paste a key."}
+        keyring.set_password(SERVICE, KEY_NAME, key)
+        self._window.destroy()
+        return {"ok": True}
+
+def runSetup():
+    api = SetupApi()
+    api._window = webview.create_window(
+        "Setup", html=SETUP_HTML, js_api=api, width=460, height=280
+    )
+    webview.start()
+
+def hasKey():
+    return bool(keyring.get_password(SERVICE, KEY_NAME) or os.getenv("ANTHROPIC_API_KEY"))
+
+# --- Main summary window ---
 HTML = """
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    html, body { margin: 0; height: 100%; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #1e1e2e; color: #cdd6f4;
-      padding: 2rem; box-sizing: border-box;
-    }
-    #output { white-space: pre-wrap; line-height: 1.6; }
-    #close { position: fixed; top: 10px; right: 14px; cursor: pointer; opacity: .5; }
-  </style>
-</head>
-<body>
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; height: 100%; }
+  body { font-family: 'Segoe UI', sans-serif; background: #1e1e2e; color: #cdd6f4;
+         padding: 2rem; box-sizing: border-box; }
+  #output { white-space: pre-wrap; line-height: 1.6; }
+  #close { position: fixed; top: 10px; right: 14px; cursor: pointer; opacity: .5; }
+</style></head><body>
   <div id="close" onclick="pywebview.api.close()">✕</div>
   <div id="output"></div>
   <script>
@@ -29,13 +68,12 @@ HTML = """
       window.scrollTo(0, document.body.scrollHeight);
     }
   </script>
-</body>
-</html>
+</body></html>
 """
 
 class Api:
     def close(self):
-        webview.windows[0].destroy
+        webview.windows[0].destroy()
 
 def formatEmails(emails, max_body=1500):
     blocks = []
@@ -45,7 +83,6 @@ def formatEmails(emails, max_body=1500):
             f"From: {e['from']}\nDate: {e['date']}\nSubject: {e['subject']}\n\n{body}"
         )
     return "\n\n---\n\n".join(blocks)
-
 
 def run(window):
     window.events.loaded.wait()
@@ -59,6 +96,10 @@ def run(window):
     )
 
 if __name__ == "__main__":
+    if not hasKey():
+        runSetup()          # prompt once, save to keyring, then exit
+        sys.exit(0)         # reopen runs the real app
+
     window = webview.create_window(
         "Weekly Email Summary", html=HTML,
         frameless=True, width=600, height=800, js_api=Api(),

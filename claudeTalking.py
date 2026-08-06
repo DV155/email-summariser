@@ -98,7 +98,7 @@ Never use conversational wrappers, preambles, sign-offs, or flattery beyond the
 required greeting line.
 """
 
-system_prompt = system_template.format(today=date.today().isoformat )
+system_prompt = system_template.format(today=date.today().isoformat())
 
 if __name__ == "__main__":
     emails = getGmail(days=7)
