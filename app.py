@@ -1,6 +1,7 @@
 import json
 import webview
 from claudeTalking import *
+import sys, os, keyring
 from mailGmail import getGmail
 
 HTML = """
