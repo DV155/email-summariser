@@ -20,7 +20,6 @@ load_dotenv()
 SERVICE = "email-summariser"
 KEY_NAME = "anthropic"
 
-client = Anthropic()
 model = "claude-haiku-4-5"
 
 def getApiKey():
@@ -29,6 +28,13 @@ def getApiKey():
         key = input("Paste your Anthropic API key").strip()
         keyring.set_password(SERVICE, KEY_NAME, key)
     return key
+
+_client = None
+def getClient():
+    global _client
+    if _client is None:
+        _client = Anthropic(api_key=getApiKey())
+    return _client
 
 
 
@@ -52,7 +58,7 @@ def chat(messages, system=None, temperature=0.3, stop_sequences=None, on_text=No
     if stop_sequences:
         params["stop_sequences"] = stop_sequences
     
-    with client.messages.stream(**params) as stream:
+    with getClient().messages.stream(**params) as stream:
         for text in stream.text_stream:
             if on_text:
                 on_text(text)
