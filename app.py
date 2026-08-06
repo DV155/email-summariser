@@ -48,7 +48,7 @@ def runSetup():
     webview.start()
 
 def hasKey():
-    return bool(keyring.get_password(SERVICE, KEY_NAME) or os.getenv("ANTHROPIC_API_KEY"))
+    return bool(keyring.get_password(SERVICE, KEY_NAME))
 
 # --- Main summary window ---
 HTML = """
