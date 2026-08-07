@@ -59,11 +59,25 @@ HTML = """
          padding: 2rem; box-sizing: border-box; }
   #output { white-space: pre-wrap; line-height: 1.6; }
   #close { position: fixed; top: 10px; right: 14px; cursor: pointer; opacity: .5; }
+
+  #loader { display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 80vh; gap: 1rem; }
+  .spinner { width: 40px; height: 40px; border: 4px solid #45475a;
+             border-top-color: #cba6f7; border-radius: 50%;
+             animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hidden { display: none; }
 </style></head><body>
   <div id="close" onclick="pywebview.api.close()">✕</div>
+  <div id="loader">
+    <div class="spinner"></div>
+    <div>Fetching and summarising your inbox…</div>
+  </div>
   <div id="output"></div>
   <script>
     function appendText(chunk) {
+      const loader = document.getElementById('loader');
+      if (loader) loader.remove();          // first chunk kills the spinner
       document.getElementById('output').textContent += chunk;
       window.scrollTo(0, document.body.scrollHeight);
     }
@@ -86,19 +100,28 @@ def formatEmails(emails, max_body=1500):
 
 def run(window):
     window.events.loaded.wait()
-    emails = getGmail(days=7)
-    messages = []
-    add_user_message(messages, formatEmails(emails))
-    chat(
-        messages,
-        system=system_prompt,
-        on_text=lambda t: window.evaluate_js(f"appendText({json.dumps(t)})"),
-    )
-
+    try:
+        emails = getGmail(days=7)
+        messages = []
+        add_user_message(messages, formatEmails(emails))
+        chat(
+            messages,
+            system=system_prompt,
+            on_text=lambda t: window.evaluate_js(f"appendText({json.dumps(t)})"),
+        )
+    except Exception as e:
+         window.evaluate_js(f"appendText({json.dumps('⚠ Error: ' + str(e))})")
 if __name__ == "__main__":
     if not hasKey():
-        runSetup()          # prompt once, save to keyring, then exit
-        sys.exit(0)         # reopen runs the real app
+        runSetup()
+        webview.create_window(
+            "Setup complete",
+            html="<body style='font-family:sans-serif;background:#1e1e2e;"
+                 "color:#cdd6f4;padding:2rem'><h3>Key saved</h3>"
+                 "<p>Please reopen the app to see your summary.</p></body>",
+        )
+        webview.start()
+        sys.exit(0)
 
     window = webview.create_window(
         "Weekly Email Summary", html=HTML,
