@@ -37,7 +37,7 @@
 
 A small desktop app that fetches your recent emails, sends them to Claude for summarisation, and shows the results in a native window with the summary streaming in as it's generated.
 
-Built as a personal learning project
+Built as a personal learning project, Outlook support planned in future
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -46,7 +46,6 @@ Built as a personal learning project
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
