@@ -16,7 +16,7 @@ def getCreds():
     if os.path.exists('token.json'):
         try:
             creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-        except:
+        except Exception as e:
             creds = None
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -35,7 +35,7 @@ def getGmail(days=7):
     creds = getCreds()
 
     service = build('gmail', 'v1', credentials=creds)
-    results = service.users().messages().list(userId='me', q=f'newer_than:7d', maxResults=100).execute()
+    results = service.users().messages().list(userId='me', q=f'newer_than:{days}d', maxResults=100).execute()
     messages = results.get('messages', [])
 
     emails = []
