@@ -1,17 +1,10 @@
 from anthropic import Anthropic
 
-
-import msal
-import requests
-
 from mailGmail import getGmail
 '''from mailOutlook import getOutlook'''
 
-import os
-import base64
-from datetime import date, datetime, timedelta
+from datetime import date
 from pathlib import Path
-from email import message_from_bytes
 import keyring
 
 SERVICE = "email-summariser"
