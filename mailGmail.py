@@ -10,12 +10,6 @@ import os
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-def getHTML(html):
-    soup = BeautifulSoup(html, "html.parser")
-    for tag in soup:
-        tag.decompose()
-    return soup.get_text(separator="\n", strip=True)
-
 def getCreds():
     creds = None
 
