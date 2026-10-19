@@ -4,7 +4,6 @@ from mailGmail import getGmail
 '''from mailOutlook import getOutlook'''
 
 from datetime import date
-from pathlib import Path
 import keyring
 
 SERVICE = "email-summariser"
